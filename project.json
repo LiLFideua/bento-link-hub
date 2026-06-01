@@ -1,7 +1,7 @@
 ﻿{
-  "name": "vibe-coding-02-bento-link-hub",
-  "title": "Bento Link Hub",
-  "description": "A self-hosted bento-grid link hub with themes and analytics.",
-  "type": "static-browser-app"
+    "title":  "Bento Link Hub",
+    "description":  "A responsive, self-hosted link hub with bento cards, themes, and local analytics.",
+    "name":  "bento-link-hub",
+    "type":  "static-browser-app"
 }
 
