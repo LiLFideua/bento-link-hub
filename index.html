@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bento Link Hub</title>
+  <style>
+    :root { color-scheme: dark; --bg:#101215; --panel:#1b2026cc; --text:#f4f7f8; --muted:#a8b1b8; --accent:#5eead4; --accent2:#f59e0b; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font:15px/1.45 Inter, ui-sans-serif, system-ui, sans-serif; background:linear-gradient(135deg,#101215,#1d2430 45%,#111827); color:var(--text); }
+    main { width:min(1120px, calc(100% - 28px)); margin:0 auto; padding:28px 0; }
+    header { display:grid; grid-template-columns:1fr auto; gap:18px; align-items:end; margin-bottom:18px; }
+    h1 { margin:0; font-size:clamp(2rem, 5vw, 4rem); line-height:1; letter-spacing:0; }
+    p { margin:8px 0 0; color:var(--muted); max-width:58ch; }
+    .controls { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    button, input, select { border:1px solid #ffffff22; border-radius:8px; background:#ffffff12; color:var(--text); padding:10px 12px; font:inherit; }
+    button { cursor:pointer; }
+    .layout { display:grid; grid-template-columns:1.2fr .8fr; gap:14px; }
+    .grid { display:grid; grid-template-columns:repeat(6, 1fr); grid-auto-rows:120px; gap:12px; }
+    .card { border:1px solid #ffffff24; border-radius:8px; padding:16px; background:var(--panel); backdrop-filter:blur(18px); color:inherit; text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; transition:transform .2s, border-color .2s; }
+    .card:hover { transform:translateY(-3px); border-color:var(--accent); }
+    .wide { grid-column:span 4; } .small { grid-column:span 2; } .tall { grid-column:span 3; grid-row:span 2; }
+    .icon { width:42px; height:42px; border-radius:8px; display:grid; place-items:center; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#071112; font-weight:800; }
+    .stats { display:grid; gap:12px; }
+    .panel { border:1px solid #ffffff20; border-radius:8px; background:#0b1016cc; padding:16px; }
+    .bar { height:10px; border-radius:999px; background:#ffffff14; overflow:hidden; margin-top:8px; }
+    .bar span { display:block; height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+    .form { display:grid; gap:10px; }
+    label { color:var(--muted); font-size:13px; }
+    input, select { width:100%; }
+    @media (max-width:800px) { header, .layout { grid-template-columns:1fr; } .controls { justify-content:flex-start; } .grid { grid-template-columns:1fr 1fr; grid-auto-rows:118px; } .wide,.small,.tall { grid-column:span 1; grid-row:span 1; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1 id="name">Lucas Hub</h1>
+        <p id="bio">A mobile-first bento page for projects, socials, writing, and contact links.</p>
+      </div>
+      <div class="controls">
+        <button id="reset">Reset analytics</button>
+        <select id="theme" aria-label="Theme">
+          <option value="ocean">Ocean</option>
+          <option value="sunset">Sunset</option>
+          <option value="mono">Mono</option>
+        </select>
+      </div>
+    </header>
+    <section class="layout">
+      <div class="grid" id="links"></div>
+      <aside class="stats">
+        <div class="panel">
+          <h2>Profile</h2>
+          <div class="form">
+            <label>Name<input id="editName" value="Lucas Hub"></label>
+            <label>Bio<input id="editBio" value="A mobile-first bento page for projects, socials, writing, and contact links."></label>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Clicks</h2>
+          <div id="analytics"></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+  <script>
+    const seed = [
+      ["GH", "GitHub", "Code experiments", "#", "wide"],
+      ["CV", "Resume", "Download the latest CV", "#", "small"],
+      ["WR", "Writing", "Notes and articles", "#", "tall"],
+      ["YT", "Videos", "Build logs and demos", "#", "small"],
+      ["IN", "LinkedIn", "Professional updates", "#", "small"],
+      ["EM", "Email", "Start a conversation", "mailto:hello@example.com", "wide"]
+    ];
+    const links = document.querySelector("#links");
+    const analytics = document.querySelector("#analytics");
+    const counts = JSON.parse(localStorage.bentoClicks || "{}");
+    function save() { localStorage.bentoClicks = JSON.stringify(counts); }
+    function renderLinks() {
+      links.innerHTML = seed.map(([icon,title,desc,url,size]) => `<a class="card ${size}" href="${url}" data-title="${title}"><span class="icon">${icon}</span><strong>${title}</strong><span>${desc}</span></a>`).join("");
+    }
+    function renderStats() {
+      const max = Math.max(1, ...seed.map(x => counts[x[1]] || 0));
+      analytics.innerHTML = seed.map(x => {
+        const value = counts[x[1]] || 0;
+        return `<div><strong>${x[1]}</strong> <span>${value}</span><div class="bar"><span style="width:${value / max * 100}%"></span></div></div>`;
+      }).join("");
+    }
+    links.addEventListener("click", e => {
+      const card = e.target.closest(".card");
+      if (!card) return;
+      counts[card.dataset.title] = (counts[card.dataset.title] || 0) + 1;
+      save(); renderStats();
+    });
+    document.querySelector("#reset").onclick = () => { Object.keys(counts).forEach(k => delete counts[k]); save(); renderStats(); };
+    document.querySelector("#theme").onchange = e => {
+      const themes = {
+        ocean:["#101215","#5eead4","#f59e0b"],
+        sunset:["#17120f","#fb7185","#fbbf24"],
+        mono:["#111111","#f5f5f5","#8b949e"]
+      };
+      const [bg,a,b] = themes[e.target.value];
+      document.documentElement.style.setProperty("--bg", bg);
+      document.documentElement.style.setProperty("--accent", a);
+      document.documentElement.style.setProperty("--accent2", b);
+    };
+    for (const id of ["Name","Bio"]) {
+      document.querySelector(`#edit${id}`).addEventListener("input", e => document.querySelector(`#${id.toLowerCase()}`).textContent = e.target.value);
+    }
+    renderLinks(); renderStats();
+  </script>
+</body>
+</html>
