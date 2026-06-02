@@ -1,7 +1,23 @@
 ﻿{
-    "title":  "Bento Link Hub",
-    "description":  "A responsive, self-hosted link hub with bento cards, themes, and local analytics.",
+    "entrypoints":  {
+                        "typescript":  "src/project-manifest.ts",
+                        "html":  "index.html",
+                        "javascript":  "assets/app.js",
+                        "css":  "assets/styles.css",
+                        "python":  "scripts/metadata_check.py"
+                    },
     "name":  "bento-link-hub",
-    "type":  "static-browser-app"
+    "description":  "A responsive, self-hosted link hub with bento cards, themes, and local analytics.",
+    "type":  "static-browser-app",
+    "languages":  [
+                      "HTML",
+                      "CSS",
+                      "JavaScript",
+                      "TypeScript",
+                      "Python",
+                      "JSON",
+                      "Markdown"
+                  ],
+    "title":  "Bento Link Hub"
 }
 
